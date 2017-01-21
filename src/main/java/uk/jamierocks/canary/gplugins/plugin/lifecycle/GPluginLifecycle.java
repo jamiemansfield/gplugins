@@ -24,14 +24,24 @@
 
 package uk.jamierocks.canary.gplugins.plugin.lifecycle;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import net.canarymod.CanaryClassLoader;
 import net.canarymod.exceptions.PluginLoadFailedException;
+import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginDescriptor;
 import net.canarymod.plugin.lifecycle.PluginLifecycleBase;
+import uk.jamierocks.canary.gplugins.guice.PluginGuiceModule;
+import uk.jamierocks.canary.gplugins.plugin.GPluginWrapper;
+
+import java.io.File;
 
 /**
  * The plugin lifecycle for gplugins.
  */
 public class GPluginLifecycle extends PluginLifecycleBase {
+
+    private CanaryClassLoader classLoader;
 
     public GPluginLifecycle(PluginDescriptor desc) {
         super(desc);
@@ -39,7 +49,25 @@ public class GPluginLifecycle extends PluginLifecycleBase {
 
     @Override
     protected void _load() throws PluginLoadFailedException {
+        try {
+            this.classLoader = new CanaryClassLoader(new File(this.desc.getPath()).toURI().toURL(), this.getClass().getClassLoader());
+            final Class<?> pluginClass = this.classLoader.loadClass(this.desc.getCanaryInf().getString("main-class"));
 
+            // mad haks bro
+            Plugin.threadLocalName.set(this.desc.getName());
+            final Injector injector = Guice.createInjector(new PluginGuiceModule(this.desc, pluginClass));
+            final Object pluginInstance = injector.getInstance(pluginClass);
+            final Plugin plugin = new GPluginWrapper(pluginInstance);
+
+            // gotta be certain
+            plugin.setName(this.desc.getName());
+            plugin.setPriority(this.desc.getPriority());
+            this.desc.setPlugin(plugin);
+
+            // TODO: hook listener
+        } catch (Exception ex) {
+            throw new PluginLoadFailedException("Failed to load plugin", ex);
+        }
     }
 
     @Override
