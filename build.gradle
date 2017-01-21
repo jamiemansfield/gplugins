@@ -1,0 +1,73 @@
+plugins {
+    id 'java'
+
+    id 'net.minecrell.licenser' version '0.3'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+group = 'uk.jamierocks.canary'
+archivesBaseName = project.name.toLowerCase()
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'neptune-temp'
+        url = 'http://www.neptunepowered.org/temprepo/'
+    }
+    maven {
+        name = 'mojang'
+        url = 'https://libraries.minecraft.net'
+    }
+    maven {
+        name = 'mcstats-releases'
+        url = 'http://repo.mcstats.org/content/repositories/releases'
+    }
+    maven {
+        name = 'mcstats-snapshots'
+        url = 'http://repo.mcstats.org/content/repositories/snapshots'
+    }
+}
+
+dependencies {
+    compile 'net.canarymod:CanaryLib:1.2.1-SNAPSHOT'
+    compile('com.google.inject:guice:4.1.0') {
+        exclude module: 'guava'
+    }
+}
+
+// Source compiler configuration
+configure([compileJava, compileTestJava]) {
+    options.compilerArgs += ['-Xlint:all', '-Xlint:-path']
+    options.deprecation = true
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    classifier = 'base'
+}
+
+shadowJar {
+    classifier = ''
+
+    dependencies {
+        include dependency('com.google.inject:guice')
+    }
+}
+
+artifacts {
+    archives shadowJar
+}
+
+license {
+    header = project.file('HEADER.txt')
+    exclude 'uk/jamierocks/canary/gplugins/config/ConfigurationProvider.java'
+    exclude 'uk/jamierocks/canary/gplugins/util/ReflectionUtil.java'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.14.1'
+}
