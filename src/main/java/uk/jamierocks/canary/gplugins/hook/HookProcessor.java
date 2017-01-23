@@ -32,9 +32,9 @@ import net.canarymod.hook.HookExecutionException;
 import net.canarymod.hook.HookHandler;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
+import uk.jamierocks.canary.gplugins.util.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,12 +45,12 @@ public final class HookProcessor {
     public static List<HookReference> scan(Object pluginObject) {
         final List<HookReference> references = Lists.newArrayList();
 
-        Arrays.stream(pluginObject.getClass().getDeclaredMethods()).filter(method -> method.isAnnotationPresent(HookHandler.class)).forEach(m -> {
+        ReflectionUtil.getMethodsAnnotatedWith(pluginObject.getClass(), HookHandler.class).forEach(m -> {
             final HookHandler handler = m.getDeclaredAnnotation(HookHandler.class);
 
             // We first need to check the parameter count
             if (m.getParameterCount() != 1) {
-                Canary.log.error("Failed to process HookHandler: {}#{}. Expected 1 parameters, found {}!",
+                Canary.log.error("Failed to process HookHandler: {}#{}. Expected 1 parameter, found {}!",
                         m.getDeclaringClass().getSimpleName(), m.getName(), m.getParameterCount());
                 return;
             }

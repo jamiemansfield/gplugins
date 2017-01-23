@@ -35,6 +35,7 @@ import net.canarymod.plugin.PluginDescriptor;
 import net.visualillusionsent.utils.PropertiesFile;
 import uk.jamierocks.canary.gplugins.ConfigFile;
 import uk.jamierocks.canary.gplugins.config.ConfigurationProvider;
+import uk.jamierocks.canary.gplugins.plugin.PluginHelper;
 
 public class PluginGuiceModule extends AbstractModule {
 
@@ -58,6 +59,7 @@ public class PluginGuiceModule extends AbstractModule {
         this.bind(this.pluginClass).in(Scopes.SINGLETON);
         this.bind(PluginDescriptor.class).toInstance(this.descriptor);
         this.bind(Logman.class).toInstance(Logman.getLogman(this.descriptor.getName()));
+        this.bind(PluginHelper.class).toInstance(new PluginHelper(this.descriptor.getName()));
 
         // Config related
         this.bind(ConfigurationProvider.class).toInstance(ConfigurationProvider.getConfigurationProvider(this.descriptor.getName()));
