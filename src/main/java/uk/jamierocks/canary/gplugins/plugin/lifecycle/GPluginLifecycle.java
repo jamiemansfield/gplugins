@@ -32,6 +32,7 @@ import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginDescriptor;
 import net.canarymod.plugin.lifecycle.PluginLifecycleBase;
 import uk.jamierocks.canary.gplugins.guice.PluginGuiceModule;
+import uk.jamierocks.canary.gplugins.hook.HookProcessor;
 import uk.jamierocks.canary.gplugins.plugin.GPluginWrapper;
 
 import java.io.File;
@@ -64,7 +65,8 @@ public class GPluginLifecycle extends PluginLifecycleBase {
             plugin.setPriority(this.desc.getPriority());
             this.desc.setPlugin(plugin);
 
-            // TODO: hook listener
+            // hook listener
+            HookProcessor.registerListener(plugin, pluginInstance);
         } catch (Exception ex) {
             throw new PluginLoadFailedException("Failed to load plugin", ex);
         }
