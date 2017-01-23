@@ -42,7 +42,7 @@ import java.util.List;
  */
 public final class HookProcessor {
 
-    public static List<HookReference> scan(Plugin plugin, Object pluginObject) {
+    public static List<HookReference> scan(Object pluginObject) {
         final List<HookReference> references = Lists.newArrayList();
 
         Arrays.stream(pluginObject.getClass().getDeclaredMethods()).filter(method -> method.isAnnotationPresent(HookHandler.class)).forEach(m -> {
@@ -50,8 +50,8 @@ public final class HookProcessor {
 
             // We first need to check the parameter count
             if (m.getParameterCount() != 1) {
-                final String hookReference = String.format("%s#%s", m.getDeclaringClass().getSimpleName(), m.getName());
-                Canary.log.error(String.format("Failed to process HookHandler: %s. Expected 1 parameters, found %d!", hookReference, m.getParameterCount()));
+                Canary.log.error("Failed to process HookHandler: {}#{}. Expected 1 parameters, found {}!",
+                        m.getDeclaringClass().getSimpleName(), m.getName(), m.getParameterCount());
                 return;
             }
 
@@ -59,8 +59,8 @@ public final class HookProcessor {
 
             // Check the hookClass is assignable from Hook
             if (!Hook.class.isAssignableFrom(hookClass)) {
-                final String hookReference = String.format("%s#%s", m.getDeclaringClass().getSimpleName(), m.getName());
-                Canary.log.error(String.format("Failed to process HookHandler: %s. Parameter is not assignable from Hook!", hookReference));
+                Canary.log.error("Failed to process HookHandler: {}#{}. Parameter is not assignable from Hook!",
+                        m.getDeclaringClass().getSimpleName(), m.getName());
                 return;
             }
 
@@ -83,7 +83,8 @@ public final class HookProcessor {
 
     public static void registerListener(Plugin plugin, Object pluginObject) {
         final PluginListener listener = new FakeListener(plugin);
-        scan(plugin, pluginObject).forEach(h -> h.register(listener));
+        Canary.hooks().registerListener(listener, plugin);
+        scan(pluginObject).forEach(h -> h.register(listener));
     }
 
     private HookProcessor() {
