@@ -30,6 +30,8 @@ import net.canarymod.commandsys.CommandListener;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginListener;
 import net.visualillusionsent.utils.LocaleHelper;
+import uk.jamierocks.canary.gplugins.command.CanaryCommandWrapper;
+import uk.jamierocks.canary.gplugins.command.CommandCallable;
 
 /**
  * A helper class provided to gplugins, providing similar convenience methods as existed in {@link Plugin}.
@@ -48,6 +50,13 @@ public final class PluginHelper {
 
     public void registerCommands(CommandListener listener, LocaleHelper translator, boolean force) throws CommandDependencyException {
         this.getPlugin().registerCommands(listener, translator, force);
+    }
+
+    public void registerCommand(CommandCallable callable, String... aliases) {
+        try {
+            Canary.commands().registerCommand(new CanaryCommandWrapper(this.getPlugin(), callable, aliases), this.getPlugin(), false);
+        } catch (CommandDependencyException ignored) {
+        }
     }
 
     public void registerListener(PluginListener listener) {

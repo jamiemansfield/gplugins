@@ -74,7 +74,9 @@ public class GPluginLifecycle extends PluginLifecycleBase {
 
     @Override
     protected void _unload() {
-
+        if (this.classLoader != null) {
+            this.classLoader.close();
+        }
     }
 
 }

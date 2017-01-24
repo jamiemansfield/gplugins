@@ -55,7 +55,7 @@ public class GPluginWrapper extends Plugin {
             try {
                 m.invoke(this.pluginObject);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                this.getLogman().error("Failed to invoke enable method: " + m.getName(), e);
+                this.getLogman().error("Failed to invoke disable method: " + m.getName(), e);
             }
         });
     }

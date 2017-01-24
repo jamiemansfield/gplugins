@@ -71,11 +71,17 @@ public @interface Plugin {
      */
     String[] dependencies() default {};
 
+    /**
+     * An annotation used to describe an enable method for a plugin.
+     */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     @interface Enable {
     }
 
+    /**
+     * An annotation used to describe an disable method for a plugin.
+     */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     @interface Disable {
