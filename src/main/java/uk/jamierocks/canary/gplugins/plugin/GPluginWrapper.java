@@ -25,6 +25,7 @@
 package uk.jamierocks.canary.gplugins.plugin;
 
 import net.canarymod.plugin.Plugin;
+import uk.jamierocks.canary.gplugins.mcstats.CanaryStatsLite;
 import uk.jamierocks.canary.gplugins.util.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -32,13 +33,19 @@ import java.lang.reflect.InvocationTargetException;
 public class GPluginWrapper extends Plugin {
 
     private final Object pluginObject;
+    private final CanaryStatsLite stats;
 
     public GPluginWrapper(Object pluginObject) {
         this.pluginObject = pluginObject;
+        this.stats = new CanaryStatsLite(this);
     }
 
     @Override
     public boolean enable() {
+        if (this.pluginObject.getClass().isAnnotationPresent(uk.jamierocks.canary.gplugins.Plugin.MetricsEnabled.class)) {
+            this.stats.start();
+        }
+
         ReflectionUtil.getMethodsAnnotatedWith(this.pluginObject.getClass(), uk.jamierocks.canary.gplugins.Plugin.Enable.class).forEach(m -> {
             try {
                 m.invoke(this.pluginObject);

@@ -30,6 +30,10 @@ repositories {
         name = 'mcstats-snapshots'
         url = 'http://repo.mcstats.org/content/repositories/snapshots'
     }
+    maven {
+        name = 'minecrell'
+        url = 'http://repo.minecrell.net/releases'
+    }
 }
 
 dependencies {
@@ -39,6 +43,7 @@ dependencies {
         exclude module: 'guava'
     }
     compile 'com.github.ben-manes.caffeine:caffeine:2.3.5'
+    compile 'net.minecrell.mcstats:statslite:0.2.2'
 }
 
 // Source compiler configuration
@@ -58,7 +63,10 @@ shadowJar {
     dependencies {
         include dependency('com.google.inject:guice')
         include dependency('com.github.ben-manes.caffeine:caffeine')
+        include dependency('net.minecrell.mcstats:statslite')
     }
+
+    relocate 'net.minecrell.mcstats', 'uk.jamierocks.canary.gplugins.relocate.net.minecrell.mcstats'
 }
 
 artifacts {

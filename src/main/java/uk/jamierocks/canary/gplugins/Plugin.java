@@ -80,11 +80,19 @@ public @interface Plugin {
     }
 
     /**
-     * An annotation used to describe an disable method for a plugin.
+     * An annotation used to describe a disable method for a plugin.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     @interface Disable {
+    }
+
+    /**
+     * An annotation used to enable reporting to mcstats.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    @interface MetricsEnabled {
     }
 
 }
