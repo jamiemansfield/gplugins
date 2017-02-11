@@ -28,8 +28,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.canarymod.chat.MessageReceiver;
+import net.canarymod.commandsys.TabCompleteDispatch;
+import net.canarymod.commandsys.TabCompleteException;
+import net.canarymod.commandsys.TabCompleteHelper;
 
 import java.util.List;
 import java.util.Map;
@@ -41,12 +45,14 @@ public final class Command implements CommandCallable {
     }
 
     private final CommandProcessor processor;
+    private final TabCompleteDispatch tabCompleteDispatch;
     private final String[] permissions;
     private final String description;
     private final String usage;
 
-    private Command(CommandProcessor processor, String permission, String description, String usage) {
+    private Command(CommandProcessor processor, TabCompleteDispatch tabCompleteDispatch, String permission, String description, String usage) {
         this.processor = processor;
+        this.tabCompleteDispatch = tabCompleteDispatch;
         this.permissions = new String[] { permission };
         this.description = description;
         this.usage = usage;
@@ -70,6 +76,11 @@ public final class Command implements CommandCallable {
     @Override
     public String getToolTip() {
         return this.usage;
+    }
+
+    @Override
+    public List<String> complete(MessageReceiver msgrec, String[] args) throws TabCompleteException {
+        return this.tabCompleteDispatch.complete(msgrec, args);
     }
 
     @Override
@@ -126,7 +137,13 @@ public final class Command implements CommandCallable {
                 this.processor(new ChildCommandProcessor(this.processor, this.childCommandMap));
             }
 
-            return new Command(this.processor, this.permission, this.description, this.usage);
+            final List<String> subCommands = Lists.newArrayList();
+            this.childCommandMap.keySet().forEach(subCommands::addAll);
+
+            final TabCompleteDispatch tabCompleteDispatch =
+                    (msgrec, args) -> TabCompleteHelper.matchTo(args, subCommands.toArray(new String[subCommands.size()]));
+
+            return new Command(this.processor, tabCompleteDispatch, this.permission, this.description, this.usage);
         }
 
     }

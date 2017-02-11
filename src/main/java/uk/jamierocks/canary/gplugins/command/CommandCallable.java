@@ -24,6 +24,11 @@
 
 package uk.jamierocks.canary.gplugins.command;
 
+import net.canarymod.chat.MessageReceiver;
+import net.canarymod.commandsys.TabCompleteException;
+
+import java.util.List;
+
 /**
  * An interface used to describe a command.
  */
@@ -34,5 +39,7 @@ public interface CommandCallable extends CommandProcessor {
     String getDescription();
 
     String getToolTip();
+
+    List<String> complete(MessageReceiver msgrec, String[] args) throws TabCompleteException;
 
 }

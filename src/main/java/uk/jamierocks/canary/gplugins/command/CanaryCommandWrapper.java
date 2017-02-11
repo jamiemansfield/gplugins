@@ -39,20 +39,21 @@ public final class CanaryCommandWrapper extends CanaryCommand {
     public CanaryCommandWrapper(CommandOwner owner, CommandCallable callable, String... aliases) {
         super(
                 new DynamicCommandAnnotation(
-                    aliases,
-                    callable.getPermissions(),
-                    callable.getDescription(),
-                    callable.getToolTip(),
-                    "",
-                    "",
-                    new String[]{ " " },
-                    0,
-                    0,
-                    "",
-                    2
+                        aliases,
+                        callable.getPermissions(),
+                        callable.getDescription(),
+                        callable.getToolTip(),
+                        "",
+                        "",
+                        new String[]{" "},
+                        0,
+                        0,
+                        "",
+                        2
                 ),
                 owner,
-                null
+                null,
+                callable::complete
         );
         this.callable = callable;
     }
