@@ -42,7 +42,7 @@ import java.util.List;
  */
 public final class HookProcessor {
 
-    public static List<HookReference> scan(Object pluginObject) {
+    public static List<HookReference> scan(Plugin plugin, Object pluginObject) {
         final List<HookReference> references = Lists.newArrayList();
 
         ReflectionUtil.getMethodsAnnotatedWith(pluginObject.getClass(), HookHandler.class).forEach(m -> {
@@ -76,6 +76,9 @@ public final class HookProcessor {
                 }
             };
             dispatcher.ignoreCanceled = handler.ignoreCanceled();
+
+            // Create hook reference
+            references.add(new HookReference(plugin, hookClass, dispatcher, handler.priority()));
         });
 
         return references;
@@ -84,7 +87,7 @@ public final class HookProcessor {
     public static void registerListener(Plugin plugin, Object pluginObject) {
         final PluginListener listener = new FakeListener(plugin);
         Canary.hooks().registerListener(listener, plugin);
-        scan(pluginObject).forEach(h -> h.register(listener));
+        scan(plugin, pluginObject).forEach(h -> h.register(listener));
     }
 
     private HookProcessor() {
