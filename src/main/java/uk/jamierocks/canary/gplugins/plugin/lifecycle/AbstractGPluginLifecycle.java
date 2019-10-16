@@ -30,29 +30,26 @@ import net.canarymod.exceptions.PluginLoadFailedException;
 import net.canarymod.plugin.Plugin;
 import net.canarymod.plugin.PluginDescriptor;
 import net.canarymod.plugin.lifecycle.PluginLifecycleBase;
-import net.minecraft.launchwrapper.Launch;
 import uk.jamierocks.canary.gplugins.guice.PluginGuiceModule;
 import uk.jamierocks.canary.gplugins.hook.HookProcessor;
 import uk.jamierocks.canary.gplugins.plugin.GPluginWrapper;
 
-import java.io.File;
+public abstract class AbstractGPluginLifecycle extends PluginLifecycleBase {
 
-/**
- * Lifecycle manager for a Neptune plugin
- *
- * @author Jamie Mansfield (jamierocks)
- */
-public class GPluginNeptuneLifecycle extends PluginLifecycleBase {
+    protected ClassLoader classLoader;
 
-    public GPluginNeptuneLifecycle(PluginDescriptor desc) {
+    public AbstractGPluginLifecycle(final PluginDescriptor desc) {
         super(desc);
     }
 
+    protected abstract ClassLoader getClassLoader() throws PluginLoadFailedException;
+
     @Override
     protected void _load() throws PluginLoadFailedException {
+        this.classLoader = this.getClassLoader();
+
         try {
-            Launch.classLoader.addURL(new File(this.desc.getPath()).toURI().toURL());
-            final Class<?> pluginClass = Launch.classLoader.loadClass(this.desc.getCanaryInf().getString("main-class"));
+            final Class<?> pluginClass = this.classLoader.loadClass(this.desc.getCanaryInf().getString("main-class"));
 
             // mad haks bro
             Plugin.threadLocalName.set(this.desc.getName());
@@ -67,7 +64,8 @@ public class GPluginNeptuneLifecycle extends PluginLifecycleBase {
 
             // hook listener
             HookProcessor.registerListener(plugin, pluginInstance);
-        } catch (Exception ex) {
+        }
+        catch (final ClassNotFoundException ex) {
             throw new PluginLoadFailedException("Failed to load plugin", ex);
         }
     }

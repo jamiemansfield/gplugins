@@ -87,12 +87,4 @@ public @interface Plugin {
     @interface Disable {
     }
 
-    /**
-     * An annotation used to enable reporting to mcstats.
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.TYPE)
-    @interface MetricsEnabled {
-    }
-
 }

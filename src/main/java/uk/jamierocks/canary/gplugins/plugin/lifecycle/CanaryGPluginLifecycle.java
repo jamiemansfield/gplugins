@@ -22,42 +22,43 @@
  * THE SOFTWARE.
  */
 
-package uk.jamierocks.canary.gplugins.plugin;
+package uk.jamierocks.canary.gplugins.plugin.lifecycle;
 
-import net.canarymod.plugin.Plugin;
-import uk.jamierocks.canary.gplugins.util.ReflectionUtil;
+import net.canarymod.CanaryClassLoader;
+import net.canarymod.exceptions.PluginLoadFailedException;
+import net.canarymod.plugin.PluginDescriptor;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
+import java.net.MalformedURLException;
 
-public class GPluginWrapper extends Plugin {
+/**
+ * The plugin lifecycle for gplugins, running on the CanaryMod
+ * server software.
+ */
+public class CanaryGPluginLifecycle extends AbstractGPluginLifecycle {
 
-    private final Object pluginObject;
-
-    public GPluginWrapper(Object pluginObject) {
-        this.pluginObject = pluginObject;
+    public CanaryGPluginLifecycle(final PluginDescriptor desc) {
+        super(desc);
     }
 
     @Override
-    public boolean enable() {
-        ReflectionUtil.getMethodsAnnotatedWith(this.pluginObject.getClass(), uk.jamierocks.canary.gplugins.Plugin.Enable.class).forEach(m -> {
-            try {
-                m.invoke(this.pluginObject);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                this.getLogman().error("Failed to invoke enable method: " + m.getName(), e);
-            }
-        });
-        return true;
+    protected ClassLoader getClassLoader() throws PluginLoadFailedException {
+        try {
+            return new CanaryClassLoader(
+                    new File(this.desc.getPath()).toURI().toURL(),
+                    this.getClass().getClassLoader()
+            );
+        }
+        catch (final MalformedURLException ex) {
+            throw new PluginLoadFailedException("Failed to create plugin class loader!", ex);
+        }
     }
 
     @Override
-    public void disable() {
-        ReflectionUtil.getMethodsAnnotatedWith(this.pluginObject.getClass(), uk.jamierocks.canary.gplugins.Plugin.Disable.class).forEach(m -> {
-            try {
-                m.invoke(this.pluginObject);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                this.getLogman().error("Failed to invoke disable method: " + m.getName(), e);
-            }
-        });
+    protected void _unload() {
+        if (this.classLoader != null && this.classLoader instanceof CanaryClassLoader) {
+            ((CanaryClassLoader) this.classLoader).close();
+        }
     }
 
 }

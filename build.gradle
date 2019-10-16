@@ -42,7 +42,6 @@ dependencies {
         exclude module: 'guava'
     }
     compile 'com.github.ben-manes.caffeine:caffeine:2.3.5'
-    compile 'net.minecrell.mcstats:statslite:0.2.2'
 
     // Neptune lifecycle
     compile 'net.minecraft:launchwrapper:1.11'

@@ -1,2 +1,2 @@
 lang-name=gplugin
-lifecycle-class=uk.jamierocks.canary.gplugins.plugin.lifecycle.GPluginNeptuneLifecycle
+lifecycle-class=uk.jamierocks.canary.gplugins.plugin.lifecycle.NeptuneGPluginLifecycle
