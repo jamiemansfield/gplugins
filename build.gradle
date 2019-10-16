@@ -2,7 +2,6 @@ plugins {
     id 'java'
 
     id 'net.minecrell.licenser' version '0.3'
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
 }
 
 sourceCompatibility = '1.8'
@@ -49,39 +48,8 @@ dependencies {
     compile 'net.minecraft:launchwrapper:1.11'
 }
 
-// Source compiler configuration
-configure([compileJava, compileTestJava]) {
-    options.compilerArgs += ['-Xlint:all', '-Xlint:-path']
-    options.deprecation = true
-    options.encoding = 'UTF-8'
-}
-
-jar {
-    classifier = 'base'
-}
-
-shadowJar {
-    classifier = ''
-
-    dependencies {
-        include dependency('com.google.inject:guice')
-        include dependency('com.github.ben-manes.caffeine:caffeine')
-        include dependency('net.minecrell.mcstats:statslite')
-    }
-
-    relocate 'net.minecrell.mcstats', 'uk.jamierocks.canary.gplugins.relocate.net.minecrell.mcstats'
-}
-
-artifacts {
-    archives shadowJar
-}
-
 license {
     header = project.file('HEADER.txt')
     exclude 'uk/jamierocks/canary/gplugins/config/ConfigurationProvider.java'
     exclude 'uk/jamierocks/canary/gplugins/util/ReflectionUtil.java'
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
 }
